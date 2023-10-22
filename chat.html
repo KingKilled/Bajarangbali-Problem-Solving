@@ -1,55 +1,45 @@
-<html lang="en">
-
+<!DOCTYPE html>
+<html>
 <head>
-  <body BGCOLOR="#f0f4ff">  
-	<meta charset="UTF-10">
-    <meta name="viewport" content="width=device-width, initial-scale=5.0">
-    <title>Chat with Ajeet</title>
-    <style>
-        /* Add some basic styling for the chat interface */
-        body {
-            font-family: Arial, sans-serif;
-            margin: 10;
-            padding: 10;
-        }
-        .chat-box {
-            width: 565px;
-            margin: 29px auto;
-            border: 10px solid #ccc;
-            border-radius: 10px;
-            padding: 10px;
-        }
-        .chat-log {
-            height: 200px;
-            overflow-y: scroll;
-            border: 10px solid #ccc;
-            border-radius: 10px;
-            padding: 10px;
-        }
-    </style>
+    <title>Chat App</title>
 </head>
 <body>
-    <div class="chat-box">
-        <h2>Chat with Ajeet</h2>
-        <div class="chat-log" id="chat-log">
-            <!-- Chat messages will be displayed here -->
-        </div>
-        <input type="text" id="user-input" placeholder="Type a message..." onkeydown="sendMessage(event)">
+    <h1>Chat App</h1>
+    <div id="chat">
+        <div id="chat-messages"></div>
+        <input type="text" id="message-input" placeholder="Type your message..." />
+        <button id="send-button">Send</button>
     </div>
-
     <script>
-        function sendMessage(event) {
-            if (event.key === "Enter") {
-                const userInput = document.getElementById("user-input");
-                const chatLog = document.getElementById("chat-log");
-                const message = userInput.value
-				
-		        //servers are not working so Please send your problems on 9648021363 number or on ajeet.shukla1978@gmail.com
-                chatLog.innerHTML += `<div><strong>You:</strong> ${message}</div>`;
-                userInput.value = "";
+        const messageInput = document.getElementById('message-input');
+        const sendButton = document.getElementById('send-button');
+        const chatMessages = document.getElementById('chat-messages');
 
-                //servers are not working so Please send your problems on 9648021363 number or on ajeet.shukla1978@gmail.com
+        const ws = new WebSocket(`ws://${window.location.host}`);
+
+        ws.addEventListener('message', (event) => {
+            appendMessage('Other User', event.data);
+        });
+
+        sendButton.addEventListener('click', () => {
+            const message = messageInput.value;
+            if (message.trim() !== '') {
+                appendMessage('You', message);
+                ws.send(message);
+                messageInput.value = '';
             }
+        });
+
+        messageInput.addEventListener('keyup', (event) => {
+            if (event.key === 'Enter') {
+                sendButton.click();
+            }
+        });
+
+        function appendMessage(sender, text) {
+            const messageDiv = document.createElement('div');
+            messageDiv.innerHTML = `<strong>${sender}:</strong> ${text}`;
+            chatMessages.appendChild(messageDiv);
         }
     </script>
 </body>
